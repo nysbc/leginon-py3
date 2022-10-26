@@ -1,0 +1,225 @@
+#
+# COPYRIGHT:
+#       The Leginon software is Copyright under
+#       Apache License, Version 2.0
+#       For terms of the license agreement
+#       see  http://leginon.org
+#
+from leginon import applications
+from leginon import leginondata
+from leginon import event
+
+class Application(object):
+	def __init__(self, node, name=None):
+		self.node = node
+		self.data = leginondata.ApplicationData()
+		if name is not None:
+			self.data['name'] = name
+		self.nodespecs = []
+		self.bindingspecs = []
+		self.launchednodes = []
+		self.launchernames = {}
+
+	def clear(self):
+		name = self.getName()
+		self.data = leginondata.ApplicationData()
+		if name is not None:
+			self.data['name'] = name
+		self.nodespecs = []
+		self.bindingspecs = []
+		self.launchednodes = []
+		self.launchernames = {}
+
+	def getName(self):
+		return self.data['name']
+
+	def setName(self, name):
+		self.data['name'] = name
+
+	def addNodeSpec(self, class_string, alias, launcheralias, dependencies=[]):
+		for spec in self.nodespecs:
+			if alias == spec['alias']:
+				self.nodespecs.remove(spec)
+				break
+		nodespecdata = leginondata.NodeSpecData()
+		nodespecdata['class string'] = class_string
+		nodespecdata['alias'] = alias
+		nodespecdata['launcher alias'] = launcheralias
+		nodespecdata['dependencies'] = dependencies
+		nodespecdata['application'] = self.data
+		self.nodespecs.append(nodespecdata)
+
+	def getLauncherAliases(self):
+		aliases = []
+		for nodespecdata in self.nodespecs:
+			if nodespecdata['launcher alias'] not in aliases:
+				aliases.append(nodespecdata['launcher alias'])
+		return aliases
+
+	def setLauncherAlias(self, alias, name):
+		self.launchernames[alias] = name
+
+	def delNodeSpec(self, alias):
+		for nodespec in self.nodespecs:
+			if nodespec['alias'] == alias:
+				self.nodespecs.remove(nodespec)
+
+	def addBindingSpec(self, eventclass_string, fromnodealias, tonodealias):
+		bindingspecdata = leginondata.BindingSpecData()
+		bindingspecdata['event class string'] = eventclass_string
+		bindingspecdata['from node alias'] = fromnodealias
+		bindingspecdata['to node alias'] = tonodealias
+		bindingspecdata['application'] = self.data
+		for spec in self.bindingspecs:
+			same = True
+			for key in bindingspecdata:
+				if bindingspecdata[key] != spec[key]:
+					same = False
+			if same:
+				raise ValueError('binding already exists in application')
+		self.bindingspecs.append(bindingspecdata)
+
+	def delBindingSpec(self, eventclass_string, fromnodealias, tonodealias):
+		bindingspecdata = leginondata.BindingSpecData()
+		bindingspecdata['event class string'] = eventclass_string
+		bindingspecdata['from node alias'] = fromnodealias
+		bindingspecdata['to node alias'] = tonodealias
+		bindingspecdata['application'] = self.data
+		for spec in self.bindingspecs:
+			same = True
+			for key in bindingspecdata:
+				if bindingspecdata[key] != spec[key]:
+					same = False
+			if same:
+				self.bindingspecs.remove(spec)
+
+	def nodeSpec2Args(self, ns):
+		try:
+			launchername = self.launchernames[ns['launcher alias']]
+		except KeyError:
+			raise ValueError('unmapped launcher alias')
+		dependencies = []
+		return (launchername, ns['class string'], ns['alias'], dependencies)
+
+	def bindingSpec2Args(self, bs):
+		try:
+			eventclass = getattr(event, bs['event class string'])
+		except:
+			# no longer want these event bindings
+			if bs['event class string'] in ['IdleTimerPauseEvent','IdleTimerRestartEvent']:
+				return
+			raise ValueError('cannot get event class for binding: %s' % (bs['event class string'],))
+		try:
+			fromnode = bs['from node alias']
+			tonode = bs['to node alias']
+		except ValueError:
+			raise ValueError('invalid binding specification')
+		return (eventclass, fromnode, tonode)
+
+	def getNodeNames(self):
+		if self.nodespecs is None:
+			return []
+		return [nsd['alias'] for nsd in self.nodespecs]
+
+	def launch(self):
+		if not hasattr(self.node, 'addEventDistmap'):
+			raise RuntimeError('application node unable to launch')
+		threads = []
+		for bindingspec in self.bindingspecs:
+			args = self.bindingSpec2Args(bindingspec)
+			if not args:
+				# ignored deplicated events
+				continue
+			self.node.addEventDistmap(*args)
+		nodeclasses = [(ns['alias'], ns['class string']) for ns in self.nodespecs]
+		self.node.updateNodeOrder(nodeclasses)
+		for nodespec in self.nodespecs:
+			args = self.nodeSpec2Args(nodespec)
+			name = self.launchNode(args)
+			self.launchednodes.append(name)
+		return self.launchednodes
+
+	def validateTransformManagerNavigatorBindings(self):
+		if self.nodespecs is None:
+			return True
+		node_classnames = [x['class string'] for x in self.nodespecs]
+		if 'Navigator' not in node_classnames or 'TransformManager' not in node_classnames:
+			return True
+		navigator_alias = self.nodespecs[node_classnames.index('Navigator')]['alias']
+		transformer_alias = self.nodespecs[node_classnames.index('TransformManager')]['alias']
+		has_to_event = False
+		has_done_event = True
+		for binding in self.bindingspecs:
+			if navigator_alias == binding['to node alias'] and transformer_alias == binding['from node alias'] and 'MoveToTargetEvent' == binding['event class string']:
+				has_to_event = True
+			if navigator_alias == binding['from node alias'] and transformer_alias == binding['to node alias'] and 'MoveToTargetDoneEvent' == binding['event class string']:
+				has_done_event = True
+		if has_to_event and has_done_event:
+			return True
+		return False
+
+	def launchNode(self, args):
+		if not hasattr(self.node, 'launchNode'):
+			raise RuntimeError('Application node unable to launch node')
+		#print('launching %s' % str(args))
+		newname = self.node.launchNode(*args)
+		return newname
+
+	def kill(self):
+		if not hasattr(self.node, 'killNode'):
+			raise RuntimeError('Application node unable to kill')
+		while self.launchednodes:
+			nodename = self.launchednodes.pop()
+			try:
+				self.node.killNode(nodename)
+			except Exception as e:
+				print(e)
+
+	def save(self):
+		self.data['version'] = self.getNewVersion(self.data['name'])
+		self.data['hide'] = False
+		self.node.publish(self.data, database=True)
+		for nodespecdata in self.nodespecs:
+			self.node.publish(nodespecdata, database=True)
+		for bindingspecdata in self.bindingspecs:
+			self.node.publish(bindingspecdata, database=True)
+		## create a copy so we can modify it
+		self.data = leginondata.ApplicationData(initializer=self.data)
+
+	def getNewVersion(self, name):
+		instance = leginondata.ApplicationData(name=name)
+		applicationdatalist = self.node.research(datainstance=instance)
+		try:
+			applicationdata = applicationdatalist[0]
+		except IndexError:
+			return 0
+		return applicationdata['version'] + 1
+
+	def load(self, name=None):
+		if name is None:
+			name = self.getName()
+		if name in applications.builtin:
+			self.load_built_in(name)
+		else:
+			self.load_from_db(name)
+
+	def load_built_in(self, name):
+		appdict = applications.builtin[name]
+		self.applicationdata = self.data = appdict['application']
+		self.nodespecs = appdict['nodes']
+		self.bindingspecs = appdict['bindings']
+
+	def load_from_db(self, name):
+		instance = leginondata.ApplicationData(name=name)
+		applicationdatalist = instance.query()
+		try:
+			appdata = applicationdatalist[0]
+		except IndexError:
+			raise ValueError('no such application')
+		nodeinstance = leginondata.NodeSpecData(application=appdata)
+		self.nodespecs = nodeinstance.query()
+		bindinginstance = leginondata.BindingSpecData(application=appdata)
+		self.bindingspecs = bindinginstance.query()
+		self.applicationdata = appdata
+		## create a copy so we can modify it
+		self.data = leginondata.ApplicationData(initializer=appdata)

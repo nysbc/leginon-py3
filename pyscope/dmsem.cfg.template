@@ -1,0 +1,53 @@
+### general dm configurations
+[dm]
+# DM Version
+DM_VERSION = 2.31.734.0
+
+### semccd plugin info
+[semccd]
+SEMCCD_PLUGIN_YEAR = 2019
+#Logger
+[logger]
+#verbosity 1=info, 2=debug
+VERBOSITY = 0
+SAVE_LOG = False
+### K2 or K3 Summit configuration through SEMCCD plugin
+[k2]
+# Camera ID
+CAMERA_ID = 0
+# The shutter that is normally closed.  Only open during acquisition.
+# Find it in GMS camera configuration (1 or 2)
+ACQUISITION_SHUTTER_NUMBER = 1
+# the value in DM camera config
+FLIP = True
+# multiple of 90 degrees (i.e. put 1 if 90 degrees, 3 if 270 degrees)
+ROTATE = 1 
+# overwrite frame orientation if the above DM camera config does not give correct frame orientation.
+OVERWRITE_FRAME_ORIENTATION = False
+FRAME_FLIP_TO_OVERWRITE_WITH = True
+# raw frame base directory. Use '\' as path separator
+RAW_FRAME_DIR = D:\frames\
+# optional timestamped frame file prefix. Required only if multiple
+# frame-saving camera is used on the same leginon database.
+FRAME_NAME_PREFIX =
+# return camera call before file is saved
+DO_EARLY_RETURN = False
+# max number of frames to sum when return early
+EARLY_RETURN_FRAME_COUNT = 0
+# save movies as lzw compressed tiff
+SAVE_LZW_TIFF_FRAMES = False
+
+# K3 only configuration
+[k3]
+# K3 processing mode. 'gain normalized' or 'dark subtracted'
+#DM_PROCESSING = gain normalized
+DM_PROCESSING = dark subtracted
+
+### Orius configuration if exists
+[orius]
+# Camera ID
+CAMERA_ID = 1
+#Midnight Delay.  Not activated if DELAY_LENGTH_MINUTES is 0
+[timing]
+DELAY_START_MINUTES_BEFORE_MIDNIGHT = 0
+DELAY_LENGTH_MINUTES = 0

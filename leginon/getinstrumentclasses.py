@@ -1,0 +1,16 @@
+#!/usr/bin/env python
+'''
+find classes in leginondata.py that have 'tem' and 'ccdcamera' as fields
+'''
+
+import inspect
+from leginon import leginondata
+
+for attr in list(leginondata.__dict__.keys()):
+   ob = getattr(leginondata, attr)
+   if inspect.isclass(ob):
+     if issubclass(ob, leginondata.Data):
+       fields = ob.typemap()
+       keys = [field[0] for field in fields]
+       if 'tem' in keys and 'ccdcamera' in keys:
+         print(attr)

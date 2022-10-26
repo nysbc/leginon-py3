@@ -1,0 +1,1002 @@
+# jeol1230.py is implemented for Jeol 1230 electron microscope
+# Copyright by New York Structural Biology Center
+# from pyScope import jeol1230 ; j = jeol1230.jeol1230()
+
+import time
+import math
+from pyscope import tem
+from pyscope import jeol1230lib
+
+try:
+	import pythoncom
+except:
+	pass
+
+Debug = False
+
+# if a stage position movement is less than the following, then ignore it
+minimum_stage = {
+	'x': 5e-8,
+	'y': 5e-8,
+	'z': 4e-7,
+	'a': 0.004,
+	'b': 0.004,
+}
+
+backlash_stage = {
+	'x': 30e-6,
+	'y': 30e-6,
+	'z': 10e-6,
+}
+
+class MagnificationsUninitialized(Exception):
+	pass
+
+class Jeol1230(tem.TEM):
+	name = 'Jeol1230'
+	def __init__(self):
+		if Debug == True:
+			print('from jeol1230.py class_defination')
+		tem.TEM.__init__(self)
+		self.correctedstage = True
+		self.jeol1230lib = jeol1230lib.jeol1230lib()
+		self.magnifications = []
+		self.mainscreenscale = 1.0
+		self.last_alpha = self.getStagePosition()['a']
+
+	# define three high tension states
+	def getHighTensionStates(self):
+		if Debug == True:
+			print('from jeol1230.py getHighTensionStates')
+		hts = ['off', 'on', 'disabled']
+		return hts
+
+	# get high tenstion status as on or off
+	def getHighTensionState(self):
+		if Debug == True:
+			print('from jeol1230.py getHighTensionState')
+		highTensionState = self.jeol1230lib.getHighTensionState()
+		return highTensionState
+
+	# get high tenstion voltage
+	def getHighTension(self):
+		if Debug == True:
+			print('from jeol1230.py getHighTension')
+		if self.jeol1230lib.getHighTensionState() == 'on':
+			highTension = self.jeol1230lib.getHighTension()
+		else:
+			highTension = 0
+		return highTension
+
+	# turn on or off high tension
+	def setHighTension(self, mode = 'off'):
+		if Debug == True:
+			print('from jeol1230.py setHighTension')
+		return True
+
+	# get three colum valve positions, not work for 1230
+	def getColumnValvePositions(self):
+		if Debug == True:
+			print("from jeol1230.py getColumnValvePositions")
+		return ['open', 'closed']
+
+	# attension: changed this to beam state
+	def getColumnValvePosition(self):
+		if Debug == True:
+			print('from jeol1230.py getColumnValvePostion')
+		state = self.getBeamState()
+		position_mapping = {'on':'open','off':'closed','unknown':'closed'}
+		return position_mapping[state]
+
+	# attension: change this to beam state
+	def setColumnValvePosition(self, position):
+		if Debug == True:
+			print('from jeol1230.py setColumnValvePosition')
+		state_mapping = {'open':'on','closed':'off'}
+		state = state_mapping[position]
+		if self.jeol1230lib.setBeamState(state) == True:
+			return True
+		else:
+			return False
+
+	# get the beam satus as on or off
+	def getBeamState(self):
+		if Debug == True:
+			print("from jeol1230.py getBeamState")
+		beamState = self.jeol1230lib.getBeamState()
+		return beamState
+
+	# attension: pump is changed to beam operation
+	def getTurboPump(self):
+		if Debug == True:
+			print("from jeol1230.py getTurboPump")
+		beamState = self.jeol1230lib.getBeamState()
+		return beamState
+
+	# attension: set the beam status
+	def setBeamState(self, mode = 'off'):
+		if Debug == True:
+			print("from jeol1230.py setBeamOnOff")
+		if self.jeol1230lib.setBeamState(mode) == True:
+			return True
+		else:
+			return False
+
+	def setEmission(self, value):
+		modes = {True:'on',False:'off'}
+		self.setBeamState(modes[value])
+
+	def getEmission(self):
+		states = {'on':True,'off':False}
+		state = self.getBeamState()
+		return states[state]
+
+	# attension: set the beam status, the same as the above
+	def setTurboPump(self, mode = 'off'):
+		if Debug == True:
+			print("from jeol1230.py setTurboPump")
+		if self.jeol1230lib.setBeamState(mode) == True:
+			return True
+		else:
+			return False
+
+	# initialize all possible magnifications
+	def setMagnifications(self, magnifications):
+		if Debug == True:
+			print('from jeol1230.py setMagnifications')
+		self.magnifications = magnifications
+		return True
+
+	# get all possible magnifications
+	def findMagnifications(self):
+		if Debug == True:
+			print('from jeol1230.py findMagnifications')
+		magnifications = self.jeol1230lib.magnification
+		self.setMagnifications(magnifications)
+		self.projection_submode_map = self.jeol1230lib.mapProjectionSubmode()
+		return True
+
+	# check if self.magnifications is initialized sucessfully
+	def getMagnificationsInitialized(self):
+		if Debug == True:
+			print("from jeol1230.py getMagnificationsInitialized")
+		if self.magnifications:
+			return True
+		else:
+			return False
+
+	# return self.magnifications
+	def getMagnifications(self):
+		if Debug == True:
+			print("from jeol1230.py getMagnifications")
+		return self.magnifications
+
+	# return a magnification number using an index
+	def getMagnification(self, index = None):
+		if Debug == True:
+			print("from jeol1230.py getMagnification")
+		if index is None:
+			return self.jeol1230lib.getMagnification()
+		elif int(index) > 40 or int(index) < 0:
+			print('    Valid magnification index should be 0-40')
+			return
+		else:
+			return self.magnifications[index]
+
+	# return the actual Mag value
+	def getMainScreenMagnification(self):
+		if Debug == True:
+			print('from jeol1230.py getMainScreenMagnification')
+		return self.jeol1230lib.getMagnification()
+
+	#  get mag index position between 0 and 40
+	def _emcGetMagPosition(self,magnification):
+		if Debug == True:
+			print('from jeol1230.py _emcGetMagPostion')
+		magRange = 40
+		mags = jeol1230lib.magnification
+		for magIndex in range(0,magRange):
+			if int(magnification) <= mags[magIndex]:
+				break
+		if magIndex > magRange:
+			print('    magnification out of range')
+		return magIndex
+
+	# get mag index position between 0 and 40
+	def getMagnificationIndex(self, magnification):
+		if Debug == True:
+			print('from jeol1230.py getMagnificationIndex')
+		magIndex = self._emcGetMagPosition(magnification)
+		return int(magIndex)
+
+	# set magnification using magnification
+	def setMagnification(self, magnification):
+		if Debug == True:
+			print('from jeol1230.py setMagnification')
+		self.jeol1230lib.setMagnification(magnification)
+		return True
+
+	# set magnification using magnification index
+	def setMagnificationIndex(self, magIndex):
+		if Debug == True:
+			print('from jeol1230.py setMagnificationIndex')
+		magnification = self.getMagnification(magIndex)
+		if self.jeol1230lib.setMagnification(magnification) == True:
+			return True
+		else:
+			return False
+
+	# don't understand it well, but it works
+	def setMainScreenScale(self, mainscreenscale = 1.0):
+		if Debug == True:
+			print('from jeol1230.py setMainScreenScale')
+		self.mainscreenscale = mainscreenscale
+		return True
+
+	# anyway, it works
+	def getMainScreenScale(self):
+		if Debug == True:
+			print('from jeol1230.py getMainScreenScale')
+		return self.mainscreenscale
+
+	# get current spot size
+	def getSpotSize(self):
+		if Debug == True:
+			print('from jeol1230.py getSpotSize')
+		spotsize = self.jeol1230lib.getSpotSize()
+		return spotsize
+
+	# set spot size between 1 and 5 as a string
+	def setSpotSize(self, spotSize, relative = 'absolute'):
+		if Debug == True:
+			print('from jeol1230.py setSpotSize')
+		if relative == 'absolute':
+			s = int(spotSize)
+		else:
+			s = int(self.getSpotSize() + spotSize)
+		if self.jeol1230lib.setSpotSize(s) == True:
+			return True
+		else:
+			return False
+
+	# return position in meter, angle in pi
+	def getStagePosition(self):
+		if Debug == True:
+			print("from jeol1230.py getStagePosition")
+		value = {'x': None, 'y': None, 'z': None, 'a': None}
+		pos = self.jeol1230lib.getStagePosition()
+		value['x'] = float(pos['x']/1e6)
+		value['y'] = float(pos['y']/1e6)
+		value['z'] = float(pos['z']/1e6)
+		value['a'] = float(pos['a']/57.3)
+		value['b'] = float(0.0)
+		return value
+
+	def checkStagePosition(self, position):
+		'''
+		Filter out the stage position axis which movement is smaller
+		than what is defined in minimum_stage
+		'''
+		current = self.getStagePosition()
+		bigenough = {}
+		for axis in ('x', 'y', 'z', 'a'):
+			# b is ignored
+			if axis in position:
+				delta = abs(position[axis] - current[axis])
+				if delta > minimum_stage[axis]:
+					bigenough[axis] = position[axis]
+		return bigenough
+
+	def confirmStagePosition(self, requested_position, axes=['z',]):
+		'''
+		Resend the requested stage position dict in axes until it reaches the tolerance.
+		'''
+		# JEM stage call may return without giving error when the position is not reached.
+		# Make it to retry.
+		# Used in alpha tilt on Jeol1230
+		accuracy = minimum_stage
+		for axis in axes:
+			self.trys = 0
+			while self.trys < 10:
+				current_position = self.getStagePosition()
+				if axis in list(requested_position.keys()) and abs(current_position[axis] - requested_position[axis]) > accuracy[axis]:
+					self.trys += 1
+					if Debug == True:
+						print('stage %s not reached' % axis)
+						print(abs(current_position[axis]-requested_position[axis]))
+					self.setStagePositionByAxis(requested_position,axis)
+				else:
+					break
+			self.trys = 0
+
+	def setStagePositionByAxis(self, position, axis):
+ 		'''
+		Set requested position dict in only one axis and ignore the rest.
+		'''
+		movable_position = self.checkStagePosition(position)
+		keys = list(movable_position.keys())
+		if axis not in keys:
+			return
+		if axis == 'a':
+			self._setStageA(movable_position)
+		elif axis == 'z':
+			self._setStageZ(movable_position)
+		else:
+			self._setStageXThenY(movable_position)
+
+	def _setStageZ(self, position):
+		'''
+		Set Stage in z axis with backlash correction. This is for
+		internal call, and will always move.  Should check if the
+		move is too small before calling this.
+		'''
+		axis = 'z'
+		# always need backlash correction or it is off by
+		# up to 2 um in display reading, even though the
+		# getStagePosition gets back that it has reached the z.
+		value_dict = position.copy() 
+		mode = 'fine'
+		prevalue = (value_dict[axis]-backlash_stage['z'])*1e6
+		self.jeol1230lib.setStagePosition(axis,prevalue,mode)
+		rawvalue = value_dict[axis]*1e6
+		self.jeol1230lib.setStagePosition(axis,rawvalue,mode)
+
+	def _setStageXThenY(self, position):
+		value_dict = position.copy()
+		for axis in ('x','y'):
+			if axis not in list(value_dict.keys()):
+				continue
+			# This gives 0.7 to 1.2 um reproducibility
+			# set to backlash position in coarse mode
+			# if no backlash correction, use coarse mode, too.
+			mode = 'coarse'
+			if self.correctedstage == True:
+				prevalue = (value_dict[axis] - backlash_stage[axis])*1e6
+				self.jeol1230lib.setStagePosition(axis,prevalue,mode)
+				# set to real position in fine mode
+				mode = 'fine'
+			rawvalue = value_dict[axis]*1e6
+			self.jeol1230lib.setStagePosition(axis,rawvalue,mode) # in micrometer
+
+	def _setStageA(self,position):
+		axis = 'a'
+		value = self.checkStagePosition(position)
+		if not value:
+			return
+		rawvalue = value[axis]*57.4
+		mode = 'fine'
+		self.jeol1230lib.setStagePosition(axis,rawvalue,mode)
+		self.confirmStagePosition(position,['a',])
+	
+	def forceTiltBack(self,position):
+		if 'a' in list(position.keys()):
+			if abs(position['a']) < math.radians(0.5):
+				position['a'] = 0.0
+			return position
+		current_tilt = self.getStagePosition()['a']
+		if abs(current_tilt - self.last_alpha) < math.radians(1.99):
+			position['a'] = self.last_alpha
+		return position
+
+	# receive position in meter, angle in pi, backlash is 30 um
+	def setStagePosition(self, position_dict):
+		# forceTiltBack changes the value, therefor it is better to work
+		# from a copy
+		value = position_dict.copy()
+		value = self.forceTiltBack(value)
+		value = self.checkStagePosition(value)
+		if not value:
+			return
+		if Debug == True:
+			print('from jeol1230.py setStagePosition')
+
+		for axis in ('x', 'y', 'z', 'a'):
+			if axis in value:
+				if axis == 'a':
+					print('set alpha %.2f' % math.degrees(value['a']))
+					self._setStageA(value)
+					self.last_alpha = value['a']
+				elif axis == 'z':
+					self._setStageZ({'z':value['z']})
+				elif axis == 'x' or axis == 'y':
+					self._setStageXThenY({axis:value[axis]})
+				else:
+					return False
+		return True
+
+	# default is correct stage movement
+	def getCorrectedStagePosition(self):
+		if Debug == True:
+			print('from jeol1230.py getCorrectedStagePosition')
+		return self.correctedstage
+
+	# set the stage move to back or not
+	def setCorrectedStagePosition(self, value = 'True'):
+		if Debug == True:
+			print('from setCorrectedStagePosition')
+		self.correctedstage = bool(value)
+		return self.correctedstage
+
+	# get defocus value, Leginon requires meter unit(negative)
+	def getDefocus(self):
+		if Debug == True:
+			print('from jeol1230.py getDefocus')
+		defocus = self.jeol1230lib.getDefocus()
+		return float(defocus)
+
+	# set defocus value
+	def setDefocus(self, defocus, relative = 'absolute'):
+		if Debug == True:
+			print('from jeol1230.py setDefocus')
+		if relative == 'absolute':
+			ss = float(defocus)
+		else:
+			ss = float(defocus) + self.getDefocus()
+		if self.jeol1230lib.setDefocus(ss) == True:
+			if abs(self.getDefocus()-defocus) > max(abs(defocus/10),1.5e-7):
+				# when defocus differences is large, the first
+				# setDefocus does not reach the set value
+				self.setDefocus(defocus,relative)
+			return True
+		else:
+			return False
+
+	# focus value is recorded as encoded objective current
+	# unit is click
+	def getFocus(self):											
+		if Debug == True:
+			print('from getFocus')
+		#pos = self.jeol1230lib.getStagePosition()
+		#focus  = float(pos['z'])/1e6
+		pos = self.jeol1230lib.getObjectiveCurrent()
+		focus  = pos
+		return focus
+
+	# set focus, unit is click
+	def setFocus(self, value):
+		if Debug == True:
+			print('from setFocus')
+		if self.jeol1230lib.setObjectiveCurrent(int(value)) ==  True:   # move stage in Z direction only
+			return True
+		else:
+			return False
+
+	# reset eucentric focus, it works when the reset button is clicked
+	def resetDefocus(self, value = 0):
+		if Debug == True:
+			print('from jeol1230.py resetDefocus')
+		self.jeol1230lib.resetDefocus(value)
+		return True
+
+	# not sure about this
+	def getResetDefocus(self):
+		if Debug == True:
+			print('from jeol1230.py getResetDefocus')
+		self.jeol1230lib.resetDefocus(0)
+		return True
+
+	# required by leginon
+	def getObjectiveExcitation(self):
+		if Debug == True:
+			print('from getObjectiveExcitation')
+		return NotImplementedError()
+
+	# get beam intensity
+	def getIntensity(self):
+		if Debug == True:
+			print('from jeol1230.py getIntensity')
+		intensity = self.jeol1230lib.getIntensity()
+		return int(intensity)
+
+	# set beam intensity
+	def setIntensity(self, intensity, relative = 'absolute'):
+		if Debug == True:
+			print('from from jeol1230.py setIntensity')
+		if relative == 'absolute':
+			ss = int(intensity)
+		else:
+			ss = int(intensity) + self.getIntensity()
+		if self.jeol1230lib.setIntensity(ss) == True:
+			return True
+		else:
+			return False
+
+	# get beam tilt
+	def getBeamTilt(self):
+		if Debug == True:
+			print('from getBeamTilt')
+		beamtilt = {'x': None, 'y': None}
+		beamtilt = self.jeol1230lib.getBeamTilt()
+		return beamtilt
+
+	# set beam tilt
+	def setBeamTilt(self, vector, relative = 'absolute'):
+		if Debug == True:
+			print('from jeol1230.py setBeamTilt')
+		for axis in ('x', 'y'):
+			if axis in vector:
+				if relative == 'absolute':
+					self.jeol1230lib.setBeamTilt(axis, vector[axis])
+				else:
+					now = {'x': None, 'y': None}
+					now = self.jeol1230lib.getBeamTilt()
+					target = {'x': None, 'y': None}
+					target[axis] = int(now[axis]) + int(vector[axis])
+					self.jeol1230lib.setBeamTilt(axis, target[axis])
+		return True
+
+	# get beam shift
+	def getBeamShift(self):
+		if Debug == True:
+			print('from jeol1230.py getBeamShift')
+		value = {'x': None, 'y': None}
+		value = self.jeol1230lib.getBeamShift()
+		return value
+
+	# set beam shift
+	def setBeamShift(self, vector, relative = 'absolute'):
+		if Debug == True:
+			print('from jeol1230.py setBeamShift')
+		for axis in ('x', 'y'):
+			if axis in vector:
+				if relative == 'absolute':
+					self.jeol1230lib.setBeamShift(axis, vector[axis])
+				else:
+					now = {'x': None, 'y': None}
+					now = self.jeol1230lib.getBeamShift()
+					target = {'x': None, 'y': None}
+					target[axis] = int(now[axis]) + int(vector[axis])
+					self.jeol1230lib.setBeamShift(axis, target[axis])
+		return True
+
+	def getDiffractionShift(self):
+		# place holder. Not implemented
+		return {'x':0.0,'y':0.0}
+
+	def setDiffractionShift(self, value):
+		# get diffraction shift in meter. Not implemented
+		pass
+
+	def getImageShift(self):
+		if Debug == True:
+			print('from jeol1230.py getImageShift')
+		vector = {'x': None, 'y': None}
+		vector = self.jeol1230lib.getImageShift()
+		return vector
+
+	# set image shift in meter
+	def setImageShift(self, vector, relative = 'absolute'):
+		if Debug == True:
+			print('from jeol1230.py setImageShift')
+		for axis in ('x', 'y'):
+			if axis in vector:
+				if relative == 'absolute':
+					self.jeol1230lib.setImageShift(axis, vector[axis])
+				else:
+					now = {'x': None, 'y': None}
+					now = self.jeol1230lib.getImageShift()
+					target = {'x': None, 'y': None}
+					target[axis] = int(now[axis]) + int(vector[axis])
+					self.jeol1230lib.setImageShift(axis, target[axis])
+		return True
+
+	# get stigmator setting
+	def getStigmator(self):
+		if Debug == True:
+			print('from jeol1230.py getStigmator')
+		vector = {'condenser': {'x': None, 'y': None},'objective': {'x': None, 'y': None},'diffraction': {'x': None, 'y': None}}
+		vector = self.jeol1230lib.getStigmator()
+		return vector
+
+	# set stigmator setting
+	def setStigmator(self, vector, relative = 'absolute'):
+		if Debug == True:
+			print('from jeol1230.py setStigmator')
+			print('    vector is', vector, relative)
+		for key in ('condenser', 'objective', 'diffraction'):
+			if key in vector:
+				for axis in ('x','y'):
+					if axis in vector[key]:
+						if relative == 'absolute':
+							self.jeol1230lib.setStigmator(key, axis, vector[key][axis])
+						else:
+							now = {'condenser': {'x': None, 'y': None},
+									'objective': {'x': None, 'y': None},
+									'diffraction': {'x': None, 'y': None}}
+							now = self.jeol1230lib.getStigmator()
+							value = {'condenser': {'x': None, 'y': None},
+									'objective': {'x': None, 'y': None},
+									'diffraction': {'x': None, 'y': None}}
+							value[key][axis] = int(now[key][axis]) + int(vector[key][axis])
+							self.jeol1230lib.setStigmator(key, axis, value[key][axis])
+		return True
+
+	# not implimented
+	def getGunShift(self):
+		if Debug == True:
+			print('from getGunShift')
+		return NotImplementedError()
+
+	# not implimented
+	def setGunShift(self, vector, relative = 'absolute'):
+		if Debug == True:
+			print('from setGunShift')
+		return NotImplementedError()
+
+	# not implimented
+	def getGunTilt(self):
+		if Debug == True:
+			print('from getGunTilt')
+		return NotImplementedError()
+
+	# not implimented
+	def setGunTilt(self, vector, relative = 'absolute'):
+		if Debug == True:
+			print('from jeol1230.py setGunTilt')
+		return NotImplementedError()
+
+	# not implimented
+	def getDarkFieldMode(self):
+		if Debug == True:
+			print('from jeol1230.py getDarkFieldMode')
+		return 'on'
+
+	# not implimented
+	def setDarkFieldMode(self, mode):
+		if Debug == True:
+			print('from jeol1230.py setDarkFieldMode')
+		return True
+
+	# not sure, but return in meter
+	def getRawImageShift(self):
+		if Debug == True:
+			print('from jeol1230.py getRawImageShift')
+		vector = {'x': None, 'y': None}
+		vector = self.jeol1230lib.getImageShift()
+		return vector
+
+	# not implimented
+	def setRawImageShift(self, vector, relative = 'absolute'):
+		if Debug == True:
+			print('from jeol1230.py setRawImageShift')
+		now = {'x': None, 'y': None}
+		now = self.jeol1230lib.getImageShift()
+		for axis in ('x', 'y'):
+			if axis in vector:
+				if relative == 'absolute':
+					self.jeol1230lib.setImageShift(axis, vector[axis])
+				else:
+					target = {'x': None, 'y': None}
+					target[axis] = int(now[axis]) + int(vector[axis])
+					self.jeol1230lib.setImageShift(axis, target[axis])
+		return True
+
+	# not implimented
+	def getVacuumStatus(self):
+		if Debug == True:
+			print("from jeol1230.py getVacuumStatus")
+		return 'unknown'
+
+	# not implimented
+	def getColumnPressure(self):
+		if Debug == True:
+			print('from jeol1230.py getColumnPressure')
+		return 1.0
+
+	# not implimented
+	def getFilmStock(self):
+		if Debug == True:
+			print('from jeol1230.py getFilmStock')
+		return 1
+
+	# not implimented
+	def setFilmStock(self):
+		if Debug == True:
+			print('from jeol1230.py setFilmStock')
+		return NotImplementedError()
+
+	# not implimented
+	def getFilmExposureNumber(self):
+		if Debug == True:
+			print('from jeol1230.py getFilmExposureNumber')
+		return 1
+
+	# not implimented
+	def setFilmExposureNumber(self, value):
+		if Debug == True:
+			print('from jeol1230.py setFilmExposureNumber')
+		return NotImplementedError()
+
+	# not implimented
+	def getFilmExposureTime(self):
+		if Debug == True:
+			print('from jeol1230.py getFilmExposureTime')
+		return 1.0
+
+	# not implimented
+	def getFilmExposureTypes(self):
+		if Debug == True:
+			print('from jeol1230.py getFilmExposureTypes')
+		return ['manual', 'automatic','unknown']
+
+	# not implimented
+	def getFilmExposureType(self):
+		if Debug == True:
+			print('from jeol1230.py getFilmExposureType')
+		return 'unknown'
+
+	# not implimented
+	def setFilmExposureType(self, value):
+		if Debug == True:
+			print('from jeol1230.py setFilmExposureType')
+		return NotImplementedError()
+
+	# not implimented
+	def getFilmAutomaticExposureTime(self):
+		if Debug == True:
+			print('from jeol1230.py getFilmAutomaticExposureTime')
+		return 1.0
+
+	# not implimented
+	def getFilmManualExposureTime(self):
+		if Debug == True:
+			print('from jeol1230.py getFilmManualExposureTime')
+		return 1
+
+	# not implimented
+	def setFilmManualExposureTime(self, value):
+		if Debug == True:
+			print('from jeol1230.py setFilmManualExposureTime')
+		return NotImplementedError()
+
+	# not implimented
+	def getFilmUserCode(self):
+		if Debug == True:
+			print('from jeol1230.py getFilmUserCode')
+		return str('mhu')
+
+	# not implimented
+	def setFilmUserCode(self, value):
+		if Debug == True:
+			print('from jeol1230.py setFilmUserCode')
+		return NotImplementedError()
+
+	# not implimented
+	def getFilmDateTypes(self):
+		if Debug == True:
+			print('from jeol1230.py getFilmDateTypes')
+		return ['no date', 'DD-MM-YY', 'MM/DD/YY', 'YY.MM.DD', 'unknown']
+
+	# not implimented
+	def getFilmDateType(self):
+		if Debug == True:
+			print('from jeol1230.py getFilmDateType')
+		return 'unknown'
+
+	# not implimented
+	def setFilmDateType(self, value):
+		if Debug == True:
+			print('from jeol1230.py setFilmDateType')
+		return NotImplementedError()
+
+	# not implimented
+	def getFilmText(self):
+		if Debug == True:
+			print('from jeol1230.py getFilmText')
+		return str('Minghui Hu')
+
+	# not implimented
+	def setFilmText(self, value):
+		if Debug == True:
+			print('from jeol1230.py setFilmText')
+		return NotImplementedError()
+
+	# not implimented
+	def getShutter(self):
+		if Debug == True:
+			print('from jeol1230.py getShutter')
+		return 'unknown'
+
+	# not implimented
+	def setShutter(self, state):
+		if Debug == True:
+			print('from jeol1230.py setShutter')
+		return NotImplementedError()
+
+	# not implimented
+	def getShutterPositions(self):
+		if Debug == True:
+			print('from jeol1230.py getShutterPositions')
+		return ['open', 'closed','unknown']
+
+	# not implimented
+	def getExternalShutterStates(self):
+		if Debug == True:
+			print('from jeol1230.py getExternalShutterStates')
+		return ['connected', 'disconnected','unknown']
+
+	# not implimented
+	def getExternalShutter(self):
+		if Debug == True:
+			print('from jeol1230.py getExternalShutter')
+		return 'unknown'
+
+	# not implimented
+	def setExternalShutter(self, state):
+		if Debug == True:
+			print('from jeol1230.py setExternalShutter')
+		return NotImplementedError()
+
+	# not implimented
+	def normalizeLens(self, lens = 'all'):
+		if Debug == True:
+			print('from jeol1230.py normalizeLens')
+		return NotImplementedError()
+
+	# not implimented
+	def getScreenCurrent(self):
+		if Debug == True:
+			print('from jeol1230.py getScreenCurrent')
+		return 1.0
+
+	# not implimented
+	def getMainScreenPositions(self):
+		if Debug == True:
+			print('from jeol1230.py getMainScreenPositions')
+		return ['up', 'down', 'unknown']
+
+	# not implimented
+	def setMainScreenPosition(self, mode):
+		if Debug == True:
+			print('from jeol1230.py setMainScreenPosition')
+		return True				# I changed it to true
+
+	# not implimented
+	def getMainScreenPosition(self):
+		if Debug == True:
+			print('from jeol1230.py getManinScreenPostion')
+		return 'up'
+
+	# not implimented
+	def getSmallScreenPositions(self):
+		if Debug == True:
+			print('from jeol1230.py getSmallScreenPositions')
+		return ['up', 'down', 'unknown']
+
+	# not implimented
+	def getSmallScreenPosition(self):
+		if Debug == True:
+			print('from jeol1230.py getSmallScreenPosition')
+		return 'unknown'
+
+	# not implimented
+	def getHolderStatus(self):
+		if Debug == True:
+			print('from jeol1230.py getHolderStatus')
+		return 'Inserted'
+
+	# not implimented
+	def getHolderTypes(self):
+		if Debug == True:
+			print('from jeol1230.py getHolderTypes')
+		return ['no holder', 'single tilt', 'cryo', 'unknown']
+
+	# not implimented
+	def getHolderType(self):
+		if Debug == True:
+			print('from jeol1230.py getHolderType')
+		return 'unknown'
+
+	# not implimented
+	def setHolderType(self, holdertype):
+		if Debug == True:
+			print('from jeol1230.py setHolderType')
+		return NotImplementedError()
+
+	# not implimented
+	def getLowDoseModes(self):
+		if Debug == True:
+			print('from jeol1230.py getLowDoseModes')
+		return ['exposure', 'focus1', 'focus2', 'search', 'unknown', 'disabled']
+
+	# not implimented
+	def getLowDoseMode(self):
+		if Debug == True:
+			print('from jeol1230.py getLowDoseMode')
+		return 'unknown'
+
+	# not implimented
+	def setLowDoseMode(self, mode):
+		if Debug == True:
+			print('from jeol1230.py setLowDoseMode')
+		return NotImplementedError()
+
+	# not implimented
+	def getLowDoseStates(self):
+		if Debug == True:
+			print('from jeol1230.py getLowDoseStates')
+		return ['on', 'off', 'disabled','unknown']
+
+	# not implimented
+	def getLowDose(self):
+		if Debug == True:
+			print('from jeol1230.py getLowDose')
+		return 'unknown'
+
+	# not implimented
+	def setLowDose(self, ld):
+		if Debug == True:
+			print('from jeol1230.py setLowDose')
+		return NotImplementedError()
+
+	# not implimented
+	def getStageStatus(self):
+		if Debug == True:
+			print('from jeol1230.py getStageStatus')
+		return 'unknown'
+
+	# not implimented
+	def getVacuumStatus(self):
+		if Debug == True:
+			print('from jeol1230.py getVacuumStatus')
+		return 'unknown'
+
+	# not implimented
+	def preFilmExposure(self, value):
+		if Debug == True:
+			print('from jeol1230.py preFilmExposure')
+		return NotImplementedError()
+
+	# not implimented
+	def postFilmExposure(self, value):
+		if Debug == True:
+			print('from jeol1230.py postFilmExposure')
+		return NotImplementedError()
+
+	# not implimented
+	def filmExposure(self, value):
+		if Debug == True:
+			print('from jeol1230.py filmExposure')
+		return NotImplementedError()
+
+	# not implimented
+	def getBeamBlank(self):
+		if Debug == True:
+			print('from jeol1230.py getBeamBlank')
+		return 'unknown'
+
+	# not implimented
+	def setBeamBlank(self, bb):
+		if Debug == True:
+			print('from jeol1230.py setBeamBlank')
+		return NotImplementedError()
+
+	# not implimented
+	def getProjectionMode(self):
+		if Debug == True:
+			print('from jeol1230.py getProjectionMode')
+		return NotImplementedError()
+
+	# not implimented
+	def setProjectionMode(self, mode):
+		if Debug == True:
+			print('from jeol1230.py setProjectionMode')
+		return NotImplementedError()
+
+	# not implimented
+	def runBufferCycle(self):
+		if Debug == True:
+			print('from jeol1230.py runBufferCycle')
+		return NotImplementedError()
+
+	def getBeamBlankedDuringCameraExchange(self):
+		# Keep it off because gun shutter is too slow.
+		return False
+
+	def getProjectionMode(self):
+		# valid values: imaging or diffraction
+		return 'imaging'
+
+	def setProjectionMode(self, value):
+		# valid values: imaging or diffraction
+		pass

@@ -1,0 +1,88 @@
+#!/usr/bin/env python
+import socket
+
+from pyami import moduleconfig
+
+def getDefaultConfigs():
+	dconfig = {}
+	myname = socket.gethostname().lower()
+	myaddress = socket.gethostbyname(myname)
+	dconfig['my ip map'] = {myname:myaddress}
+	return dconfig
+
+try:
+	# combine is set to false because this is only meaningful to be at one level: Host
+	configs = moduleconfig.getConfigured('pyami.cfg', package='pyami', combine=False)
+except:
+	configs = getDefaultConfigs()
+
+def getLoadedConfigs():
+	'''
+	Test Function that handles IOError and return empty list.  This does not
+	set default.
+	'''
+	try:
+		return moduleconfig.getConfigured('pyami.cfg', package='pyami', combine=False)
+	except:
+		return []
+
+def getHostMappings():
+	hostdict = configs['my ip map'].copy()
+	if 'other ip map' in configs:
+		hostdict.update(configs['other ip map'])
+	return hostdict
+
+def gethostname():
+	try:
+		return list(configs['my ip map'].keys())[0]  # This is o.k. because I know I only have one key.
+	except:
+		KeyError('Missing "my ip map" module in pyami.cfg')
+
+def gethostbyname(hostname):
+	lower_hostname = hostname.lower()
+	try:
+		ipaddress = getHostMappings()[lower_hostname]
+	except KeyError:
+		ipaddress = None
+	if not ipaddress:
+		try:
+			ipaddress = socket.gethostbyname(lower_hostname)
+		except Exception as e:
+			raise LookupError(e)
+	return ipaddress
+
+def testMapping(addr, host):
+	'''
+	Test that the address in pyami.cfg is mapped to the assigned hostname.
+	'''
+	try:
+		socket_host = socket.gethostbyaddr(addr)[0]
+		assigned_host = host
+		if assigned_host == socket_host:
+			return True
+		else:
+			e = '%s is mapped to %s in the network, not %s' % (addr, socket_host, assigned_host)
+			raise ValueError(e)
+	except socket.herror as e:
+			e = '%s mapping error in socket module: %s of %s' % (addr, e, addr)
+			raise ValueError(e)
+	except Exception as e:
+		raise LookupError(e)
+
+def test():
+	from . import testfun
+	allmaps = getHostMappings()
+	for host in list(allmaps.keys()):
+		module = '%s ip mapping' % (host)
+		addr = allmaps[host]
+		try:
+			r = testMapping(addr, host)
+			testfun.printResult(module,r)
+		except Exception as e:
+			testfun.printResult(module,False, e)
+
+if __name__=='__main__':
+	test()
+	import sys
+	if sys.platform == 'win32':
+		input('Hit any key to quit.')

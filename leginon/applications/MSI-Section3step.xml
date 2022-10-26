@@ -1,0 +1,827 @@
+<!--
+-
+- Application XML-Dump
+- http://emg.nysbc.org/ 
+-
+- Application :MSI-Section3step
+- Version     :1
+- Date : 10/19/2010
+-
+-->
+
+<applicationdump>
+ <definition>
+ <sqltable name="ApplicationData" >
+    <field 
+      name="DEF_id" 
+      type="int(16)" 
+      null="NOT NULL" 
+      extra="auto_increment" 
+    />
+    <field 
+      name="DEF_timestamp" 
+      type="timestamp" 
+      default="DEFAULT 'CURRENT_TIMESTAMP'" 
+      null="NOT NULL" 
+    />
+    <field 
+      name="name" 
+      type="text" 
+    />
+    <field 
+      name="version" 
+      type="int(20)" 
+    />
+    <field 
+      name="hide" 
+      type="tinyint(1)" 
+    />
+    <key>PRIMARY KEY (`DEF_id`)</key>
+    <key>KEY `DEF_timestamp` (`DEF_timestamp`)</key>
+  </sqltable>
+ <sqltable name="BindingSpecData" >
+    <field 
+      name="DEF_id" 
+      type="int(16)" 
+      null="NOT NULL" 
+      extra="auto_increment" 
+    />
+    <field 
+      name="DEF_timestamp" 
+      type="timestamp" 
+      default="DEFAULT 'CURRENT_TIMESTAMP'" 
+      null="NOT NULL" 
+    />
+    <field 
+      name="event class string" 
+      type="text" 
+    />
+    <field 
+      name="from node alias" 
+      type="text" 
+    />
+    <field 
+      name="to node alias" 
+      type="text" 
+    />
+    <field 
+      name="REF|ApplicationData|application" 
+      type="int(20)" 
+    />
+    <key>PRIMARY KEY (`DEF_id`)</key>
+    <key>KEY `DEF_timestamp` (`DEF_timestamp`)</key>
+    <key>KEY `REF|ApplicationData|application` (`REF|ApplicationData|application`)</key>
+  </sqltable>
+ <sqltable name="NodeSpecData" >
+    <field 
+      name="DEF_id" 
+      type="int(16)" 
+      null="NOT NULL" 
+      extra="auto_increment" 
+    />
+    <field 
+      name="DEF_timestamp" 
+      type="timestamp" 
+      default="DEFAULT 'CURRENT_TIMESTAMP'" 
+      null="NOT NULL" 
+    />
+    <field 
+      name="class string" 
+      type="text" 
+    />
+    <field 
+      name="alias" 
+      type="text" 
+    />
+    <field 
+      name="launcher alias" 
+      type="text" 
+    />
+    <field 
+      name="SEQ|dependencies" 
+      type="text" 
+    />
+    <field 
+      name="REF|ApplicationData|application" 
+      type="int(20)" 
+    />
+    <key>PRIMARY KEY (`DEF_id`)</key>
+    <key>KEY `DEF_timestamp` (`DEF_timestamp`)</key>
+    <key>KEY `REF|ApplicationData|application` (`REF|ApplicationData|application`)</key>
+  </sqltable>
+
+ </definition>
+ <data>
+  <!-- ApplicationData -->
+    <sqltable name="ApplicationData" >
+        <field name="DEF_id" >18</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="name" >MSI-Section3step</field>
+        <field name="version" >3</field>
+        <field name="hide" >0</field>
+    </sqltable>
+  <!-- BindingSpecData -->
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >850</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >MakeTargetListEvent</field>
+        <field name="from node alias" >Grid Baking</field>
+        <field name="to node alias" >Grid Targeting</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >851</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >ChangePresetEvent</field>
+        <field name="from node alias" >Grid Baking</field>
+        <field name="to node alias" >Presets Manager</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >852</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >MakeTargetListEvent</field>
+        <field name="from node alias" >Choose Grid</field>
+        <field name="to node alias" >Grid Baking</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >853</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >ImageTargetListPublishEvent</field>
+        <field name="from node alias" >Rough Tissue Targeting</field>
+        <field name="to node alias" >Tilt Rotate</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >854</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >TargetListDoneEvent</field>
+        <field name="from node alias" >Grid</field>
+        <field name="to node alias" >Rough Tissue Targeting</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >855</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >AcquisitionImagePublishEvent</field>
+        <field name="from node alias" >Grid</field>
+        <field name="to node alias" >Rough Tissue Targeting</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >856</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >ChangePresetEvent</field>
+        <field name="from node alias" >Grid</field>
+        <field name="to node alias" >Presets Manager</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >857</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >MoveToTargetEvent</field>
+        <field name="from node alias" >Grid</field>
+        <field name="to node alias" >Navigation</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >858</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >TargetListDoneEvent</field>
+        <field name="from node alias" >Rough Tissue</field>
+        <field name="to node alias" >Tilt Rotate</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >859</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >ChangePresetEvent</field>
+        <field name="from node alias" >Rough Tissue</field>
+        <field name="to node alias" >Presets Manager</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >860</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >AcquisitionImagePublishEvent</field>
+        <field name="from node alias" >Rough Tissue</field>
+        <field name="to node alias" >Tissue Centering</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >861</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >MoveToTargetEvent</field>
+        <field name="from node alias" >Rough Tissue</field>
+        <field name="to node alias" >Navigation</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >862</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >ImageTargetListPublishEvent</field>
+        <field name="from node alias" >Rough Tissue</field>
+        <field name="to node alias" >Grid Focus</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >863</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >TransformTargetEvent</field>
+        <field name="from node alias" >Rough Tissue</field>
+        <field name="to node alias" >Transformer</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >864</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >QueuePublishEvent</field>
+        <field name="from node alias" >Final Raster Targeting</field>
+        <field name="to node alias" >Final Raster</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >865</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >ImageTargetListPublishEvent</field>
+        <field name="from node alias" >Final Raster Targeting</field>
+        <field name="to node alias" >Final Raster</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >866</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >TargetListDoneEvent</field>
+        <field name="from node alias" >Final Raster Targeting</field>
+        <field name="to node alias" >Tissue Centering</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >867</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >ImageProcessDoneEvent</field>
+        <field name="from node alias" >Tissue Centering</field>
+        <field name="to node alias" >Rough Tissue</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >868</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >ImageTargetListPublishEvent</field>
+        <field name="from node alias" >Tissue Centering</field>
+        <field name="to node alias" >Final Raster Targeting</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >869</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >QueuePublishEvent</field>
+        <field name="from node alias" >Tissue Centering</field>
+        <field name="to node alias" >Final Raster Targeting</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >870</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >ChangePresetEvent</field>
+        <field name="from node alias" >Section Focus</field>
+        <field name="to node alias" >Presets Manager</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >871</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >TargetListDoneEvent</field>
+        <field name="from node alias" >Section Focus</field>
+        <field name="to node alias" >Final Raster</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >872</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >MoveToTargetEvent</field>
+        <field name="from node alias" >Section Focus</field>
+        <field name="to node alias" >Navigation</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >873</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >ImageTargetListPublishEvent</field>
+        <field name="from node alias" >Section Focus</field>
+        <field name="to node alias" >Auto Exposure</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >874</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >TransformTargetEvent</field>
+        <field name="from node alias" >Final Raster</field>
+        <field name="to node alias" >Transformer</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >875</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >TargetListDoneEvent</field>
+        <field name="from node alias" >Final Raster</field>
+        <field name="to node alias" >Choose Grid</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >876</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >ImageTargetListPublishEvent</field>
+        <field name="from node alias" >Final Raster</field>
+        <field name="to node alias" >Section Focus</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >877</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >ChangePresetEvent</field>
+        <field name="from node alias" >Final Raster</field>
+        <field name="to node alias" >Presets Manager</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >878</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >TargetListDoneEvent</field>
+        <field name="from node alias" >Final Raster</field>
+        <field name="to node alias" >Final Raster Targeting</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >879</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >MoveToTargetEvent</field>
+        <field name="from node alias" >Final Raster</field>
+        <field name="to node alias" >Navigation</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >880</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >ChangePresetEvent</field>
+        <field name="from node alias" >Navigation</field>
+        <field name="to node alias" >Presets Manager</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >881</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >MoveToTargetDoneEvent</field>
+        <field name="from node alias" >Navigation</field>
+        <field name="to node alias" >Presets Manager</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >882</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >MoveToTargetDoneEvent</field>
+        <field name="from node alias" >Navigation</field>
+        <field name="to node alias" >Grid</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >883</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >MoveToTargetDoneEvent</field>
+        <field name="from node alias" >Navigation</field>
+        <field name="to node alias" >Rough Tissue</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >884</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >MoveToTargetDoneEvent</field>
+        <field name="from node alias" >Navigation</field>
+        <field name="to node alias" >Section Focus</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >885</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >MoveToTargetDoneEvent</field>
+        <field name="from node alias" >Navigation</field>
+        <field name="to node alias" >Final Raster</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >886</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >MoveToTargetDoneEvent</field>
+        <field name="from node alias" >Navigation</field>
+        <field name="to node alias" >Grid Focus</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >887</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >MoveToTargetDoneEvent</field>
+        <field name="from node alias" >Navigation</field>
+        <field name="to node alias" >Auto Exposure</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >888</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >PresetChangedEvent</field>
+        <field name="from node alias" >Presets Manager</field>
+        <field name="to node alias" >Grid Baking</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >889</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >PresetChangedEvent</field>
+        <field name="from node alias" >Presets Manager</field>
+        <field name="to node alias" >Section Focus</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >890</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >PresetChangedEvent</field>
+        <field name="from node alias" >Presets Manager</field>
+        <field name="to node alias" >Final Raster</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >891</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >PresetChangedEvent</field>
+        <field name="from node alias" >Presets Manager</field>
+        <field name="to node alias" >Rough Tissue</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >892</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >PresetChangedEvent</field>
+        <field name="from node alias" >Presets Manager</field>
+        <field name="to node alias" >Grid</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >893</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >PresetChangedEvent</field>
+        <field name="from node alias" >Presets Manager</field>
+        <field name="to node alias" >Navigation</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >894</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >MoveToTargetEvent</field>
+        <field name="from node alias" >Presets Manager</field>
+        <field name="to node alias" >Navigation</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >895</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >PresetChangedEvent</field>
+        <field name="from node alias" >Presets Manager</field>
+        <field name="to node alias" >Grid Focus</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >896</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >PresetChangedEvent</field>
+        <field name="from node alias" >Presets Manager</field>
+        <field name="to node alias" >Transformer</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >897</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >PresetChangedEvent</field>
+        <field name="from node alias" >Presets Manager</field>
+        <field name="to node alias" >Auto Exposure</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >898</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >ImageTargetListPublishEvent</field>
+        <field name="from node alias" >Grid Targeting</field>
+        <field name="to node alias" >Grid</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >899</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >TargetListDoneEvent</field>
+        <field name="from node alias" >Grid Focus</field>
+        <field name="to node alias" >Rough Tissue</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >900</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >ChangePresetEvent</field>
+        <field name="from node alias" >Grid Focus</field>
+        <field name="to node alias" >Presets Manager</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >901</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >MoveToTargetEvent</field>
+        <field name="from node alias" >Grid Focus</field>
+        <field name="to node alias" >Navigation</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >902</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >ImageTargetListPublishEvent</field>
+        <field name="from node alias" >Tilt Rotate</field>
+        <field name="to node alias" >Rough Tissue</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >903</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >TransformTargetDoneEvent</field>
+        <field name="from node alias" >Transformer</field>
+        <field name="to node alias" >Final Raster</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >904</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >TransformTargetDoneEvent</field>
+        <field name="from node alias" >Transformer</field>
+        <field name="to node alias" >Rough Tissue</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >905</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >ChangePresetEvent</field>
+        <field name="from node alias" >Transformer</field>
+        <field name="to node alias" >Presets Manager</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >906</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >TransformTargetDoneEvent</field>
+        <field name="from node alias" >Transformer</field>
+        <field name="to node alias" >Auto Exposure</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >907</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >ChangePresetEvent</field>
+        <field name="from node alias" >Auto Exposure</field>
+        <field name="to node alias" >Presets Manager</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >908</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >UpdatePresetEvent</field>
+        <field name="from node alias" >Auto Exposure</field>
+        <field name="to node alias" >Presets Manager</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >909</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >MoveToTargetEvent</field>
+        <field name="from node alias" >Auto Exposure</field>
+        <field name="to node alias" >Navigation</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >910</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >TransformTargetEvent</field>
+        <field name="from node alias" >Auto Exposure</field>
+        <field name="to node alias" >Transformer</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >911</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="event class string" >TargetListDoneEvent</field>
+        <field name="from node alias" >Auto Exposure</field>
+        <field name="to node alias" >Section Focus</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+  <!-- NodeSpecData -->
+    <sqltable name="NodeSpecData" >
+        <field name="DEF_id" >263</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="class string" >EM</field>
+        <field name="alias" >Instrument</field>
+        <field name="launcher alias" >scope</field>
+        <field name="SEQ|dependencies" >[]</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="NodeSpecData" >
+        <field name="DEF_id" >264</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="class string" >Baker</field>
+        <field name="alias" >Grid Baking</field>
+        <field name="launcher alias" >main</field>
+        <field name="SEQ|dependencies" >[]</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="NodeSpecData" >
+        <field name="DEF_id" >265</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="class string" >GridEntry</field>
+        <field name="alias" >Choose Grid</field>
+        <field name="launcher alias" >main</field>
+        <field name="SEQ|dependencies" >[]</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="NodeSpecData" >
+        <field name="DEF_id" >266</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="class string" >MosaicClickTargetFinder</field>
+        <field name="alias" >Rough Tissue Targeting</field>
+        <field name="launcher alias" >main</field>
+        <field name="SEQ|dependencies" >[]</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="NodeSpecData" >
+        <field name="DEF_id" >267</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="class string" >Acquisition</field>
+        <field name="alias" >Grid</field>
+        <field name="launcher alias" >main</field>
+        <field name="SEQ|dependencies" >[]</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="NodeSpecData" >
+        <field name="DEF_id" >268</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="class string" >Corrector</field>
+        <field name="alias" >Correction</field>
+        <field name="launcher alias" >main</field>
+        <field name="SEQ|dependencies" >[]</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="NodeSpecData" >
+        <field name="DEF_id" >269</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="class string" >Acquisition</field>
+        <field name="alias" >Rough Tissue</field>
+        <field name="launcher alias" >main</field>
+        <field name="SEQ|dependencies" >[]</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="NodeSpecData" >
+        <field name="DEF_id" >270</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="class string" >RasterTargetFilter</field>
+        <field name="alias" >Final Raster Targeting</field>
+        <field name="launcher alias" >main</field>
+        <field name="SEQ|dependencies" >[]</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="NodeSpecData" >
+        <field name="DEF_id" >271</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="class string" >DTFinder</field>
+        <field name="alias" >Tissue Centering</field>
+        <field name="launcher alias" >main</field>
+        <field name="SEQ|dependencies" >[]</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="NodeSpecData" >
+        <field name="DEF_id" >272</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="class string" >Focuser</field>
+        <field name="alias" >Section Focus</field>
+        <field name="launcher alias" >main</field>
+        <field name="SEQ|dependencies" >[]</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="NodeSpecData" >
+        <field name="DEF_id" >273</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="class string" >Acquisition</field>
+        <field name="alias" >Final Raster</field>
+        <field name="launcher alias" >main</field>
+        <field name="SEQ|dependencies" >[]</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="NodeSpecData" >
+        <field name="DEF_id" >274</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="class string" >Navigator</field>
+        <field name="alias" >Navigation</field>
+        <field name="launcher alias" >main</field>
+        <field name="SEQ|dependencies" >[]</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="NodeSpecData" >
+        <field name="DEF_id" >275</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="class string" >PresetsManager</field>
+        <field name="alias" >Presets Manager</field>
+        <field name="launcher alias" >main</field>
+        <field name="SEQ|dependencies" >[]</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="NodeSpecData" >
+        <field name="DEF_id" >276</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="class string" >MosaicTargetMaker</field>
+        <field name="alias" >Grid Targeting</field>
+        <field name="launcher alias" >main</field>
+        <field name="SEQ|dependencies" >[]</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="NodeSpecData" >
+        <field name="DEF_id" >277</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="class string" >Focuser</field>
+        <field name="alias" >Grid Focus</field>
+        <field name="launcher alias" >main</field>
+        <field name="SEQ|dependencies" >[]</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="NodeSpecData" >
+        <field name="DEF_id" >278</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="class string" >TiltRotateRepeater</field>
+        <field name="alias" >Tilt Rotate</field>
+        <field name="launcher alias" >main</field>
+        <field name="SEQ|dependencies" >[]</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="NodeSpecData" >
+        <field name="DEF_id" >279</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="class string" >TransformManager</field>
+        <field name="alias" >Transformer</field>
+        <field name="launcher alias" >main</field>
+        <field name="SEQ|dependencies" >[]</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="NodeSpecData" >
+        <field name="DEF_id" >280</field>
+        <field name="DEF_timestamp" >2010-10-19 19:01:56</field>
+        <field name="class string" >AutoExposure</field>
+        <field name="alias" >Auto Exposure</field>
+        <field name="launcher alias" >main</field>
+        <field name="SEQ|dependencies" >[]</field>
+        <field name="REF|ApplicationData|application" >18</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >22079</field>
+        <field name="DEF_timestamp" >2011-10-10 18:25:01</field>
+        <field name="event class string" >MoveToTargetEvent</field>
+        <field name="from node alias" >Transformer</field>
+        <field name="to node alias" >Navigation</field>
+        <field name="REF|ApplicationData|application" >728</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >22111</field>
+        <field name="DEF_timestamp" >2011-10-10 18:25:01</field>
+        <field name="event class string" >MoveToTargetDoneEvent</field>
+        <field name="from node alias" >Navigation</field>
+        <field name="to node alias" >Transformer</field>
+        <field name="REF|ApplicationData|application" >728</field>
+    </sqltable>
+  <!-- TEMControl -->
+    <sqltable name="NodeSpecData" >
+        <field name="DEF_id" >170</field>
+        <field name="DEF_timestamp" >2018-01-04 22:36:37</field>
+        <field name="class string" >TEMController</field>
+        <field name="alias" >Scope Control</field>
+        <field name="launcher alias" >main</field>
+        <field name="SEQ|dependencies" >[]</field>
+        <field name="REF|ApplicationData|application" >8</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >604</field>
+        <field name="DEF_timestamp" >2018-01-04 22:36:37</field>
+        <field name="event class string" >ChangePresetEvent</field>
+        <field name="from node alias" >Scope Control</field>
+        <field name="to node alias" >Presets Manager</field>
+        <field name="REF|ApplicationData|application" >8</field>
+    </sqltable>
+    <sqltable name="BindingSpecData" >
+        <field name="DEF_id" >605</field>
+        <field name="DEF_timestamp" >2018-01-04 22:36:37</field>
+        <field name="event class string" >PresetChangedEvent</field>
+        <field name="from node alias" >Presets Manager</field>
+        <field name="to node alias" >Scope Control</field>
+        <field name="REF|ApplicationData|application" >8</field>
+    </sqltable>
+
+ </data>
+</applicationdump>
