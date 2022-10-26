@@ -1,4 +1,12 @@
 [[package]]
+name = "future"
+version = "0.18.2"
+description = "Clean single-source support for Python 3 and 2"
+category = "main"
+optional = false
+python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
+
+[[package]]
 name = "numpy"
 version = "1.23.4"
 description = "NumPy is the fundamental package for array computing with Python."
@@ -66,9 +74,12 @@ six = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "d051d9fcb253ab4d204a0dbb5860539eea4cbed6fe238d86c92fe2a2ea19d73e"
+content-hash = "2403bac8e8b0e35070d775c710339ea516cd7f192f870c35b65e7a0d14d17728"
 
 [metadata.files]
+future = [
+    {file = "future-0.18.2.tar.gz", hash = "sha256:b1bead90b70cf6ec3f0710ae53a525360fa360d306a86583adc6bf83a4db537d"},
+]
 numpy = []
 pillow = []
 pymysql = [

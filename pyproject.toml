@@ -11,6 +11,7 @@ scipy = "^1.5.4"
 pillow = "^8.1.0"
 pymysql = "^1.0.2"
 wxpython = "4.1.1"
+future = "^0.18.2"
 
 [tool.poetry.dev-dependencies]
 
