@@ -2,7 +2,7 @@
 name = "leginon-py3"
 version = "0.1.0"
 description = ""
-authors = ["cesar mena <cmena@nysbc.org>"]
+authors = ["semcit <semcit@nysbc.org>"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
