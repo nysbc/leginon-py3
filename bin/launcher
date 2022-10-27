@@ -3,14 +3,16 @@ set -e
 
 src=$(realpath "$0")
 csd=$(dirname "$src")
-# parent.
+# root directory
 cd "$(dirname "$csd")"
 
+# shellcheck source=/dev/null
 source .venv/bin/activate
 
 # echo "NOTICE: leginon cwd is [$(pwd)]" 1>&2
 
 # because leginon.* is referenced from within it :/ 
-export PYTHONPATH=leginon
+PYTHONPATH="$(pwd)"
+export PYTHONPATH
 
 python leginon/launcher.py "$@"
