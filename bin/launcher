@@ -1,0 +1,11 @@
+#!/bin/bash
+set -e
+
+src=$(realpath "$0")
+csd=$(dirname "$src")
+# parent.
+cd "$(dirname "$csd")"
+
+# echo "NOTICE: leginon cwd is [$(pwd)]" 1>&2
+
+poetry run python launcher.py "$@"
