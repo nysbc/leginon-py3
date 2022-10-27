@@ -1,11 +1,7 @@
 #!/bin/bash
 set -e
 
-src=$(realpath "$0")
-csd=$(dirname "$src")
-# parent.
-cd "$(dirname "$csd")"
+# shellcheck disable=SC1090
+source "$(dirname "${BASH_SOURCE[0]}")/_env"
 
-# echo "NOTICE: leginon cwd is [$(pwd)]" 1>&2
-
-poetry run python start.py "$@"
+python leginon/start.py "$@"

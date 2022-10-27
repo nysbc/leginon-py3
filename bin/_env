@@ -1,0 +1,15 @@
+#!/bin/bash
+
+src=$(realpath "$0")
+csd=$(dirname "$src")
+# root directory
+cd "$(dirname "$csd")"
+
+# shellcheck source=/dev/null
+source .venv/bin/activate
+
+# echo "NOTICE: leginon cwd is [$(pwd)]" 1>&2
+
+# because leginon.* is referenced from within itself :/ 
+PYTHONPATH="$(pwd)"
+export PYTHONPATH

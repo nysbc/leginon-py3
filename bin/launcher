@@ -1,18 +1,7 @@
 #!/bin/bash
 set -e
 
-src=$(realpath "$0")
-csd=$(dirname "$src")
-# root directory
-cd "$(dirname "$csd")"
-
-# shellcheck source=/dev/null
-source .venv/bin/activate
-
-# echo "NOTICE: leginon cwd is [$(pwd)]" 1>&2
-
-# because leginon.* is referenced from within it :/ 
-PYTHONPATH="$(pwd)"
-export PYTHONPATH
+# shellcheck disable=SC1090
+source "$(dirname "${BASH_SOURCE[0]}")/_env"
 
 python leginon/launcher.py "$@"
