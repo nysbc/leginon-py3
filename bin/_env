@@ -3,7 +3,6 @@ set -e
 
 src=$(realpath "$0")
 csd=$(dirname "$src")
-# root directory
 root="$(dirname "$csd")"
 
 # shellcheck source=/dev/null

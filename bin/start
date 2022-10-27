@@ -4,4 +4,4 @@ set -e
 # shellcheck disable=SC1090
 source "$(dirname "${BASH_SOURCE[0]}")/_env"
 
-python leginon/start.py "$@"
+python "${root:?}/leginon/start.py" "$@"
