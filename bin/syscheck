@@ -8,4 +8,4 @@ cd "$(dirname "$csd")"
 
 # echo "NOTICE: leginon cwd is [$(pwd)]" 1>&2
 
-poetry run python start.py "$@"
+poetry run python leginon/syscheck.py "$@"
