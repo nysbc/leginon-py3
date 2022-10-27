@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 src=$(realpath "$0")
 csd=$(dirname "$src")
