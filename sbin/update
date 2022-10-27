@@ -1,0 +1,13 @@
+#!/bin/bash
+set -u
+set -e
+
+version="${1:-origin/main}"
+
+echo "= update to version: $version"
+
+git fetch --all
+git reset --hard "$version"
+git clean -fd
+
+echo "= ok"

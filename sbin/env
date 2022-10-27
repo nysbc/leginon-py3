@@ -1,0 +1,15 @@
+#!/bin/bash
+# shellcheck disable=SC2139
+
+root=/opt/leginon-manager
+poetry=/usr/local/bin/poetry
+
+alias c=clear
+alias r="cd $root; clear"
+alias v="$root/sbin/version"
+
+alias s="git status"
+
+alias p="$poetry"
+alias psh="$poetry shell"
+alias prun="$poetry run python"
