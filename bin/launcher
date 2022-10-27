@@ -14,5 +14,6 @@ source .venv/bin/activate
 # because leginon.* is referenced from within it :/ 
 PYTHONPATH="$(pwd)"
 export PYTHONPATH
+echo "PYTHONPATH = $PYTHONPATH"
 
 python leginon/launcher.py "$@"
