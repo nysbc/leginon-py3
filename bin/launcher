@@ -6,6 +6,11 @@ csd=$(dirname "$src")
 # parent.
 cd "$(dirname "$csd")"
 
+source .venv/bin/activate
+
 # echo "NOTICE: leginon cwd is [$(pwd)]" 1>&2
 
-poetry run python launcher.py "$@"
+# because leginon.* is referenced from within it :/ 
+export PYTHONPATH=leginon
+
+python leginon/launcher.py "$@"
