@@ -1,0 +1,8 @@
+.gitattributes export-ignore
+.gitignore export-ignore
+/sbin export-ignore
+/bin export-ignore
+.venv export-ignore
+/modules export-ignore
+poetry.lock export-ignore
+pyproject.toml export-ignore
