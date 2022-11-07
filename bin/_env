@@ -1,13 +1,29 @@
 #!/bin/bash
 set -e
+set -u 
 
 src=$(realpath "$0")
 csd=$(dirname "$src")
 root="$(dirname "$csd")"
 
-# shellcheck source=/dev/null
-source "$root/.venv/bin/activate"
+pyenv=${pyenv=default}
 
-# because leginon.* is referenced from within itself :/ 
+case $pyenv in
+    default)
+        # shellcheck disable=SC1090
+        source "$root/.venv/bin/activate"
+    ;;
+    conda)
+        # shellcheck disable=SC1090
+        source ~/miniconda3/etc/profile.d/conda.sh
+        conda activate base
+    ;;
+    *)
+        echo "_env: unrecognized venv: $pyenv"
+        exit 1
+    ;;
+esac
+
+# because leginon.* is referenced from within itself
 PYTHONPATH="$root"
 export PYTHONPATH

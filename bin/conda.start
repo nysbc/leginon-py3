@@ -2,7 +2,10 @@
 set -e
 set -u
 
+# shellcheck disable=SC2034
+pyenv=conda 
+
 # shellcheck disable=SC1090
 source "$(dirname "${BASH_SOURCE[0]}")/_env"
 
-python "${root:?}/leginon/launcher.py" "$@"
+python "${root:?}/leginon/start.py" "$@"
